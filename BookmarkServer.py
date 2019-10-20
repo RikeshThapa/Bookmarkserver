@@ -44,6 +44,7 @@
 import http.server
 import requests
 from urllib.parse import unquote, parse_qs
+import os
 
 memory = {}
 
@@ -145,6 +146,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             raise NotImplementedError("Step 5 isn't written yet!")
 
 if __name__ == '__main__':
+    port = int(os.environment.get('PORT', 8000)) #use port numnber if its there designed for Heroku server port listener
     server_address = ('', 8000)
     httpd = http.server.HTTPServer(server_address, Shortener)
     httpd.serve_forever()
