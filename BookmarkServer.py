@@ -45,6 +45,8 @@ import http.server
 import requests
 from urllib.parse import unquote, parse_qs
 import os
+import threading
+from socketserver import ThreadingMixIn
 
 memory = {}
 
@@ -67,6 +69,8 @@ form = '''<!DOCTYPE html>
 </pre>
 '''
 
+class ThreadHttpServer(ThreadingMixIn, http.server.HTTPServer):
+    "This is a HTTPServer that supports thread-based concurrency."
 
 def CheckURI(uri, timeout=5):
     '''Check whether this URI is reachable, i.e. does it return a 200 OK?
@@ -85,8 +89,6 @@ def CheckURI(uri, timeout=5):
     except Exception as e:
         raise "Error times out"
         return False
-
-
 
 
 class Shortener(http.server.BaseHTTPRequestHandler):
@@ -148,5 +150,5 @@ class Shortener(http.server.BaseHTTPRequestHandler):
 if __name__ == '__main__':
     port = int(os.environment.get('PORT', 8000)) #use port numnber if its there designed for Heroku server port listener
     server_address = ('', 8000)
-    httpd = http.server.HTTPServer(server_address, Shortener)
+    httpd = ThreadHttpServer(server_address, Shortener)
     httpd.serve_forever()
